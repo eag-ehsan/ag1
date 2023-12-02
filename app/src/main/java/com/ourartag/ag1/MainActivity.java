@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     // Initializing other items
     // from layout file
     TextView latitudeTextView, longitTextView;
-
+    int iCounter;
     Button btn;
     WebView mywv;
     int PERMISSION_ID = 44;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        iCounter = 0;
         latitudeTextView = findViewById(R.id.latTextView);
         longitTextView = findViewById(R.id.lonTextView);
         btn = findViewById(R.id.button);
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         WebSettings webSettings = mywv.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
+        mywv.setVisibility(View.INVISIBLE);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -66,12 +67,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //getLastLocation();
-
+        esTimer timer = new esTimer(new Runnable() {
+            public void run() {
+                counterString();
+            }
+        }, 1000, true);
 
 
     }
 
-
+    private void counterString() {
+        String strtmp = "iCounter is " + iCounter;
+        iCounter++;
+        latitudeTextView.setText(strtmp);
+    }
 
     @SuppressLint("MissingPermission")
     private void getLastLocation() {
