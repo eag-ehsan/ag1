@@ -9,6 +9,11 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     // Initializing other items
     // from layout file
     TextView latitudeTextView, longitTextView;
+
+    Button btn;
+    WebView mywv;
     int PERMISSION_ID = 44;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +48,26 @@ public class MainActivity extends AppCompatActivity {
 
         latitudeTextView = findViewById(R.id.latTextView);
         longitTextView = findViewById(R.id.lonTextView);
+        btn = findViewById(R.id.button);
+        mywv = findViewById(R.id.webview1);
+        WebSettings webSettings = mywv.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // method to get the location
-        getLastLocation();
+        btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                getLastLocation();
+                String strtemp = "";
+                strtemp = "https://www.ourartag.com/posi.php?l=" + latitudeTextView.getText() + "&i=1&n=" + longitTextView.getText();
+                mywv.loadUrl(strtemp);
+            }
+        });
+        //getLastLocation();
+
+
 
     }
 
