@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     int iCounter;
     Button btn;
     WebView mywv;
+
+    esTimer timer1000;
     int PERMISSION_ID = 44;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,24 +59,46 @@ public class MainActivity extends AppCompatActivity {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // method to get the location
-        btn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                getLastLocation();
-                String strtemp = "";
-                strtemp = "https://www.ourartag.com/posi.php?l=" + latitudeTextView.getText() + "&i=1&n=" + longitTextView.getText();
-                mywv.loadUrl(strtemp);
-            }
-        });
-        //getLastLocation();
-        esTimer timer = new esTimer(new Runnable() {
+        timer1000 = new esTimer(new Runnable() {
             public void run() {
                 counterString();
             }
-        }, 1000, true);
+        }, 1000, false);
+
+        // method to get the location
+        btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                runAdmincmd("run2");
+            }
+        });
+        //getLastLocation();
 
 
     }
+
+    private void runAdmincmd(String cmmd) {
+        if(cmmd.equals("run1")){
+            getAndSendCoords();
+        }else if(cmmd.equals("run2")){
+            timer1000.startTimer();
+
+        }else if(cmmd.equals("run3")){
+
+        }else if(cmmd.equals("run4")){
+
+        }else if(cmmd.equals("run5")){
+
+        }
+    }
+
+    private void getAndSendCoords() {
+        getLastLocation();
+        String strtemp = "";
+        strtemp = "https://www.ourartag.com/posi.php?l=" + latitudeTextView.getText() + "&i=1&n=" + longitTextView.getText();
+        mywv.loadUrl(strtemp);
+
+    }
+
 
     private void counterString() {
         String strtmp = "iCounter is " + iCounter;
