@@ -29,41 +29,42 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-
 public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient mFusedLocationClient;
 
     // Initializing other items
     // from layout file
     TextView latitudeTextView, longitTextView;
+    TextView adminCommands;
     int iCounter;
     Button btn;
     WebView mywv;
-
+    Javascript myjavascript;
     esTimer timer1000;
+    esTimer myMainTimer;
     int PERMISSION_ID = 44;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         iCounter = 0;
+
+        adminCommands = findViewById(R.id.adminc);
         latitudeTextView = findViewById(R.id.latTextView);
         longitTextView = findViewById(R.id.lonTextView);
+
         btn = findViewById(R.id.button);
         mywv = findViewById(R.id.webview1);
         WebSettings webSettings = mywv.getSettings();
         webSettings.setJavaScriptEnabled(true);
-
+        myjavascript = new Javascript(getApplicationContext());
+        mywv.addJavascriptInterface(myjavascript, "Android");
         mywv.setVisibility(View.INVISIBLE);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        timer1000 = new esTimer(new Runnable() {
-            public void run() {
-                counterString();
-            }
-        }, 1000, false);
+        timer1000 = new esTimer(new Runnable() {public void run() {getAndSendCoords();}}, 30000, true);
+        myMainTimer = new esTimer(new Runnable() {public void run() {mainLoop();}}, 5000, true);
 
         // method to get the location
         btn.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         if(cmmd.equals("run1")){
             getAndSendCoords();
         }else if(cmmd.equals("run2")){
-            timer1000.startTimer();
+            //timer1000.startTimer();
 
         }else if(cmmd.equals("run3")){
 
@@ -100,10 +101,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void counterString() {
-        String strtmp = "iCounter is " + iCounter;
-        iCounter++;
-        latitudeTextView.setText(strtmp);
+    private void mainLoop() {
+
+        if(myjavascript.isThereAnyData()) {
+            String strtmp = "New Admin cmd: " + myjavascript.getMyData();
+            adminCommands.setText(strtmp);
+        }
+
+
     }
 
     @SuppressLint("MissingPermission")
