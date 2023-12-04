@@ -9,7 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-
+import android.graphics.BitmapFactory;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -28,16 +28,28 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
+import org.neshan.mapsdk.MapView;
+import org.neshan.common.model.LatLng;
+import org.neshan.mapsdk.model.Marker;
+import com.carto.styles.AnimationStyle;
+import com.carto.styles.AnimationStyleBuilder;
+import com.carto.styles.AnimationType;
+import com.carto.styles.MarkerStyle;
+import com.carto.styles.MarkerStyleBuilder;
+import com.carto.utils.BitmapUtils;
 public class MainActivity extends AppCompatActivity {
     FusedLocationProviderClient mFusedLocationClient;
 
     // Initializing other items
     // from layout file
+    private MapView map;
+    private AnimationStyle animSt;
+    LatLng latlng;
+    private Marker marker;
     TextView latitudeTextView, longitTextView;
     TextView adminCommands;
     int iCounter;
-    Button btn;
+    Button btn,btn2;
     WebView mywv;
     Javascript myjavascript;
     esTimer timer1000;
@@ -54,29 +66,66 @@ public class MainActivity extends AppCompatActivity {
         longitTextView = findViewById(R.id.lonTextView);
 
         btn = findViewById(R.id.button);
+        btn2 = findViewById(R.id.button2);
         mywv = findViewById(R.id.webview1);
         WebSettings webSettings = mywv.getSettings();
         webSettings.setJavaScriptEnabled(true);
         myjavascript = new Javascript(getApplicationContext());
         mywv.addJavascriptInterface(myjavascript, "Android");
-        mywv.setVisibility(View.INVISIBLE);
+        map = findViewById(R.id.map);
+        map.setTrafficEnabled(true);
 
+        map.moveCamera(new LatLng(35.767234, 51.330743), 0);
+        map.setZoom(14, 0);
+        map.getSettings().setZoomControlsEnabled(true);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        timer1000 = new esTimer(new Runnable() {public void run() {getAndSendCoords();}}, 30000, true);
-        myMainTimer = new esTimer(new Runnable() {public void run() {mainLoop();}}, 5000, true);
+        timer1000 = new esTimer(new Runnable() {public void run() {getAndSendCoords();}}, 30000, false);
+        myMainTimer = new esTimer(new Runnable() {public void run() {mainLoop();}}, 5000, false);
 
         // method to get the location
-        btn.setOnClickListener(new View.OnClickListener() {
+        btn2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                runAdmincmd("run2");
+
+                getLastLocation();
+                map.setZoom(14, 0);
+                Float temfll = Float.valueOf(latitudeTextView.getText().toString());
+                Float tempfln = Float.valueOf(longitTextView.getText().toString());
+//                map.getSettings().setZoomControlsEnabled(true);
+                addUserMarker(new LatLng(temfll, tempfln));
+
+//                map.addMarker(createMarker(latlng));
+                map.moveCamera(new LatLng(temfll, tempfln), .5f);
+
             }
         });
         //getLastLocation();
 
 
     }
+    private void addUserMarker(LatLng loc) {
+        //remove existing marker from map
+        if (marker != null) {
+            marker.setLatLng(loc);
+        } else {
+            // Creating marker style. We should use an object of type MarkerStyleCreator, set all features on it
+            // and then call buildStyle method on it. This method returns an object of type MarkerStyle
+            MarkerStyleBuilder markStCr = new MarkerStyleBuilder();
+            markStCr.setSize(30f);
+            markStCr.setAnchorPointY(0);
+            markStCr.setAnchorPointX(0);
+            markStCr.setBitmap(BitmapUtils.createBitmapFromAndroidBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.markerg)));
+            MarkerStyle markSt = markStCr.buildStyle();
 
+            // Creating user marker
+            marker = new Marker(loc, markSt);
+
+            // Adding user marker to map!
+            map.addMarker(marker);
+
+        }
+
+    }
     private void runAdmincmd(String cmmd) {
         if(cmmd.equals("run1")){
             getAndSendCoords();

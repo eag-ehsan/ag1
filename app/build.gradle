@@ -11,7 +11,7 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName '1.1'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -29,6 +29,10 @@ android {
 }
 
 dependencies {
+
+    implementation 'neshan-android-sdk:mobile-sdk:1.0.3'
+    implementation 'neshan-android-sdk:services-sdk:1.0.0'
+    implementation 'neshan-android-sdk:common-sdk:0.0.3'
 
     implementation 'androidx.webkit:webkit:1.9.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
